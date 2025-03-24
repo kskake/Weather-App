@@ -85,11 +85,22 @@
         <div class="error" id="errorMessage"></div>
     </div>
 
+    <!-- Load the config file -->
+    <script src="config.js"></script>
     <script>
-        const apiKey = 'YOUR_API_KEY_HERE'; // Replace with your OpenWeather API key
+        // Use the API key from config.js or prompt the user
+        const apiKey = window.API_KEY || prompt('Please enter your OpenWeather API key');
+        
+        // Check if API key is provided
+        const errorMessage = document.getElementById('errorMessage');
+        if (!apiKey) {
+            errorMessage.style.display = 'block';
+            errorMessage.textContent = 'API key required. Add it in config.js or enter it when prompted.';
+            throw new Error('No API key provided');
+        }
+
         const input = document.getElementById('cityInput');
         const weatherInfo = document.getElementById('weatherInfo');
-        const errorMessage = document.getElementById('errorMessage');
         const cityName = document.getElementById('cityName');
         const temperature = document.getElementById('temperature');
         const description = document.getElementById('description');
