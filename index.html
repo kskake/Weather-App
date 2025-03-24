@@ -20,6 +20,7 @@
             transition: background-image 1s ease;
             background-size: cover;
             background-position: center;
+            background-color: #87CEEB; /* Fallback color */
             background-image: linear-gradient(to bottom, #87CEEB, #E0F6FF); /* Fallback gradient */
         }
 
@@ -146,16 +147,20 @@
     <script src="config.js"></script>
     <script>
         // Load API key
-        const apiKey = window.API_KEY || prompt('Please enter your OpenWeather API key');
-        const errorMessage = document.getElementById('errorMessage');
+        let apiKey = window.API_KEY;
         if (!apiKey) {
-            errorMessage.style.display = 'block';
-            errorMessage.textContent = 'API key required. Add it in config.js or enter it when prompted.';
-            throw new Error('No API key provided');
+            apiKey = prompt('Please enter your OpenWeather API key');
+            if (!apiKey) {
+                const errorMessage = document.getElementById('errorMessage');
+                errorMessage.style.display = 'block';
+                errorMessage.textContent = 'API key required. Add it in config.js or enter it when prompted.';
+                throw new Error('No API key provided');
+            }
         }
 
         const input = document.getElementById('cityInput');
         const weatherInfo = document.getElementById('weatherInfo');
+        const errorMessage = document.getElementById('errorMessage');
         const cityName = document.getElementById('cityName');
         const weatherIcon = document.getElementById('weatherIcon');
         const temperature = document.getElementById('temperature');
@@ -244,18 +249,14 @@
                 console.log(`Weather condition: ${weatherMain}`); // Debug log
                 const backgroundUrl = backgrounds[weatherMain] || backgrounds['default'];
                 console.log(`Setting background to: ${backgroundUrl}`); // Debug log
-                document.body.style.backgroundImage = backgroundUrl;
 
-            } catch (error) {
-                weatherInfo.style.display = 'none';
-                errorMessage.style.display = 'block';
-                errorMessage.textContent = 'City not found. Please try again.';
-                document.body.style.backgroundImage = backgrounds['default'];
-            }
-        }
-
-        // Get weather for default city on load
-        getWeather('Phoenix');
-    </script>
-</body>
-</html>
+                // Test if the background image loads
+                const img = new Image();
+                img.src = backgroundUrl.replace('url("', '').replace('")', '');
+                img.onload = () => {
+                    console.log('Background image loaded successfully');
+                    document.body.style.backgroundImage = backgroundUrl;
+                };
+                img.onerror = () => {
+                    console.error('Failed to load background image, using fallback');
+                    document.body.style.backgroundImage = 'linear-gradient(to bottom
