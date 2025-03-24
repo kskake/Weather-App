@@ -252,11 +252,27 @@
 
                 // Test if the background image loads
                 const img = new Image();
-                img.src = backgroundUrl.replace('url("', '').replace('")', '');
+                const imgSrc = backgroundUrl.replace('url("', '').replace('")', '');
+                img.src = imgSrc;
                 img.onload = () => {
                     console.log('Background image loaded successfully');
                     document.body.style.backgroundImage = backgroundUrl;
                 };
                 img.onerror = () => {
                     console.error('Failed to load background image, using fallback');
-                    document.body.style.backgroundImage = 'linear-gradient(to bottom
+                    document.body.style.backgroundImage = 'linear-gradient(to bottom, #87CEEB, #E0F6FF)';
+                };
+
+            } catch (error) {
+                weatherInfo.style.display = 'none';
+                errorMessage.style.display = 'block';
+                errorMessage.textContent = 'City not found. Please try again.';
+                document.body.style.backgroundImage = 'linear-gradient(to bottom, #87CEEB, #E0F6FF)';
+            }
+        }
+
+        // Get weather for default city on load (changed to Phoenix)
+        getWeather('Phoenix');
+    </script>
+</body>
+</html>
