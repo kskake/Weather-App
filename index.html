@@ -160,7 +160,7 @@
             if (!apiKey) {
                 const errorMessage = document.getElementById('errorMessage');
                 errorMessage.style.display = 'block';
-                errorMessage.textContent = 'API key required. Add it in config.js or enter it when prompted.';
+                errorMessage.textContent = 'API key required. Add it in config.js or enter it when prompted. Sign up at OpenWeather to get your API key.';
                 throw new Error('No API key provided');
             }
         }
