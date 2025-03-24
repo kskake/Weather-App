@@ -34,15 +34,31 @@
         .search-box {
             width: 100%;
             padding: 1rem 0;
+            display: flex;
+            gap: 10px;
         }
 
         .search-box input {
-            width: 100%;
+            flex: 1;
             padding: 0.8rem;
             border: 1px solid #ddd;
             border-radius: 5px;
             font-size: 1rem;
             outline: none;
+        }
+
+        .search-box button {
+            padding: 0.8rem 1rem;
+            border: none;
+            background: #007bff;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .search-box button:hover {
+            background: #0056b3;
         }
 
         .weather-info {
@@ -54,21 +70,46 @@
             margin: 1rem 0;
         }
 
+        .weather-icon img {
+            width: 100px;
+            height: 100px;
+        }
+
         .weather-info .temperature {
             font-size: 3rem;
             margin: 1rem 0;
+            cursor: pointer;
         }
 
         .weather-info .description {
             font-size: 1.2rem;
             color: #666;
             text-transform: capitalize;
+            margin-bottom: 1rem;
+        }
+
+        .weather-details {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 1rem;
+            font-size: 1rem;
+            color: #333;
+        }
+
+        .weather-details div {
+            text-align: center;
+        }
+
+        .weather-details div span {
+            display: block;
+            font-weight: bold;
         }
 
         .error {
             color: #ff4444;
             text-align: center;
             display: none;
+            margin-top: 1rem;
         }
     </style>
 </head>
@@ -76,22 +117,35 @@
     <div class="container">
         <div class="search-box">
             <input type="text" placeholder="Enter city name" id="cityInput">
+            <button id="unitToggle">°C/°F</button>
         </div>
         <div class="weather-info" id="weatherInfo" style="display: none;">
             <h1 id="cityName"></h1>
+            <div class="weather-icon" id="weatherIcon"></div>
             <div class="temperature" id="temperature"></div>
             <div class="description" id="description"></div>
+            <div class="weather-details">
+                <div>
+                    <span id="feelsLike"></span>
+                    Feels Like
+                </div>
+                <div>
+                    <span id="humidity"></span>
+                    Humidity
+                </div>
+                <div>
+                    <span id="windSpeed"></span>
+                    Wind Speed
+                </div>
+            </div>
         </div>
         <div class="error" id="errorMessage"></div>
     </div>
 
-    <!-- Load the config file -->
     <script src="config.js"></script>
     <script>
-        // Use the API key from config.js or prompt the user
+        // Load API key
         const apiKey = window.API_KEY || prompt('Please enter your OpenWeather API key');
-        
-        // Check if API key is provided
         const errorMessage = document.getElementById('errorMessage');
         if (!apiKey) {
             errorMessage.style.display = 'block';
@@ -102,8 +156,13 @@
         const input = document.getElementById('cityInput');
         const weatherInfo = document.getElementById('weatherInfo');
         const cityName = document.getElementById('cityName');
+        const weatherIcon = document.getElementById('weatherIcon');
         const temperature = document.getElementById('temperature');
         const description = document.getElementById('description');
+        const feelsLike = document.getElementById('feelsLike');
+        const humidity = document.getElementById('humidity');
+        const windSpeed = document.getElementById('windSpeed');
+        const unitToggle = document.getElementById('unitToggle');
 
         // Background images for different weather conditions
         const backgrounds = {
@@ -115,6 +174,34 @@
             'mist': 'url("https://source.unsplash.com/1600x900/?mist")',
             'default': 'url("https://source.unsplash.com/1600x900/?nature")'
         };
+
+        // State to track temperature unit
+        let isCelsius = true;
+        let currentWeatherData = null; // Store the latest weather data
+
+        // Toggle temperature unit
+        unitToggle.addEventListener('click', () => {
+            isCelsius = !isCelsius;
+            unitToggle.textContent = isCelsius ? '°C/°F' : '°F/°C';
+            if (currentWeatherData) {
+                updateTemperatureDisplay(currentWeatherData);
+            }
+        });
+
+        // Update temperature display based on unit
+        function updateTemperatureDisplay(data) {
+            const temp = data.main.temp;
+            const feelsLikeTemp = data.main.feels_like;
+            if (isCelsius) {
+                temperature.textContent = `${Math.round(temp)}°C`;
+                feelsLike.textContent = `${Math.round(feelsLikeTemp)}°C`;
+            } else {
+                const tempF = (temp * 9/5) + 32;
+                const feelsLikeF = (feelsLikeTemp * 9/5) + 32;
+                temperature.textContent = `${Math.round(tempF)}°F`;
+                feelsLike.textContent = `${Math.round(feelsLikeF)}°F`;
+            }
+        }
 
         input.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
@@ -133,14 +220,23 @@
                 }
 
                 const data = await response.json();
+                currentWeatherData = data; // Store the data for unit toggle
                 
                 // Update UI
                 weatherInfo.style.display = 'block';
                 errorMessage.style.display = 'none';
                 
                 cityName.textContent = data.name;
-                temperature.textContent = `${Math.round(data.main.temp)}°C`;
+                updateTemperatureDisplay(data);
                 description.textContent = data.weather[0].description;
+
+                // Set weather icon
+                const iconCode = data.weather[0].icon;
+                weatherIcon.innerHTML = `<img src="http://openweathermap.org/img/wn/${iconCode}@2x.png" alt="Weather Icon">`;
+
+                // Additional weather details
+                humidity.textContent = `${data.main.humidity}%`;
+                windSpeed.textContent = `${data.wind.speed} m/s`;
 
                 // Change background based on weather
                 const weatherMain = data.weather[0].main.toLowerCase();
