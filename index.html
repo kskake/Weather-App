@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background-image 1s ease;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 2rem;
+            border-radius: 15px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 1rem 0;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .weather-info {
+            text-align: center;
+        }
+
+        .weather-info h1 {
+            font-size: 2rem;
+            margin: 1rem 0;
+        }
+
+        .weather-info .temperature {
+            font-size: 3rem;
+            margin: 1rem 0;
+        }
+
+        .weather-info .description {
+            font-size: 1.2rem;
+            color: #666;
+            text-transform: capitalize;
+        }
+
+        .error {
+            color: #ff4444;
+            text-align: center;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="search-box">
+            <input type="text" placeholder="Enter city name" id="cityInput">
+        </div>
+        <div class="weather-info" id="weatherInfo" style="display: none;">
+            <h1 id="cityName"></h1>
+            <div class="temperature" id="temperature"></div>
+            <div class="description" id="description"></div>
+        </div>
+        <div class="error" id="errorMessage"></div>
+    </div>
+
+    <script>
+        const apiKey = 'YOUR_API_KEY_HERE'; // Replace with your OpenWeather API key
+        const input = document.getElementById('cityInput');
+        const weatherInfo = document.getElementById('weatherInfo');
+        const errorMessage = document.getElementById('errorMessage');
+        const cityName = document.getElementById('cityName');
+        const temperature = document.getElementById('temperature');
+        const description = document.getElementById('description');
+
+        // Background images for different weather conditions
+        const backgrounds = {
+            'clear': 'url("https://source.unsplash.com/1600x900/?sunny")',
+            'clouds': 'url("https://source.unsplash.com/1600x900/?cloudy")',
+            'rain': 'url("https://source.unsplash.com/1600x900/?rain")',
+            'snow': 'url("https://source.unsplash.com/1600x900/?snow")',
+            'thunderstorm': 'url("https://source.unsplash.com/1600x900/?thunderstorm")',
+            'mist': 'url("https://source.unsplash.com/1600x900/?mist")',
+            'default': 'url("https://source.unsplash.com/1600x900/?nature")'
+        };
+
+        input.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                getWeather(input.value);
+            }
+        });
+
+        async function getWeather(city) {
+            try {
+                const response = await fetch(
+                    `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`
+                );
+                
+                if (!response.ok) {
+                    throw new Error('City not found');
+                }
+
+                const data = await response.json();
+                
+                // Update UI
+                weatherInfo.style.display = 'block';
+                errorMessage.style.display = 'none';
+                
+                cityName.textContent = data.name;
+                temperature.textContent = `${Math.round(data.main.temp)}°C`;
+                description.textContent = data.weather[0].description;
+
+                // Change background based on weather
+                const weatherMain = data.weather[0].main.toLowerCase();
+                document.body.style.backgroundImage = backgrounds[weatherMain] || backgrounds['default'];
+
+            } catch (error) {
+                weatherInfo.style.display = 'none';
+                errorMessage.style.display = 'block';
+                errorMessage.textContent = 'City not found. Please try again.';
+                document.body.style.backgroundImage = backgrounds['default'];
+            }
+        }
+
+        // Get weather for default city on load
+        getWeather('London');
+    </script>
+</body>
+</html>
