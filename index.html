@@ -170,15 +170,15 @@
         const windSpeed = document.getElementById('windSpeed');
         const unitToggle = document.getElementById('unitToggle');
 
-        // Background images for different weather conditions
+        // Background images for different weather conditions (using local images)
         const backgrounds = {
-            'clear': 'url("https://source.unsplash.com/1600x900/?sunny")',
-            'clouds': 'url("https://source.unsplash.com/1600x900/?cloudy")',
-            'rain': 'url("https://source.unsplash.com/1600x900/?rain")',
-            'snow': 'url("https://source.unsplash.com/1600x900/?snow")',
-            'thunderstorm': 'url("https://source.unsplash.com/1600x900/?thunderstorm")',
-            'mist': 'url("https://source.unsplash.com/1600x900/?mist")',
-            'default': 'url("https://source.unsplash.com/1600x900/?nature")'
+            'clear': 'url("sunny.jpg")',
+            'clouds': 'url("cloudy.jpg")',
+            'rain': 'url("rain.jpg")',
+            'snow': 'url("snow.jpg")',
+            'thunderstorm': 'url("thunderstorm.jpg")',
+            'mist': 'url("mist.jpg")',
+            'default': 'url("nature.jpg")'
         };
 
         // State to track temperature unit
@@ -271,7 +271,7 @@
             }
         }
 
-        // Get weather for default city on load (changed to Phoenix)
+        // Get weather for default city on load (Phoenix)
         getWeather('Phoenix');
     </script>
 </body>
