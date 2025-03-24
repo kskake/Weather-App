@@ -20,6 +20,7 @@
             transition: background-image 1s ease;
             background-size: cover;
             background-position: center;
+            background-image: linear-gradient(to bottom, #87CEEB, #E0F6FF); /* Fallback gradient */
         }
 
         .container {
@@ -240,7 +241,10 @@
 
                 // Change background based on weather
                 const weatherMain = data.weather[0].main.toLowerCase();
-                document.body.style.backgroundImage = backgrounds[weatherMain] || backgrounds['default'];
+                console.log(`Weather condition: ${weatherMain}`); // Debug log
+                const backgroundUrl = backgrounds[weatherMain] || backgrounds['default'];
+                console.log(`Setting background to: ${backgroundUrl}`); // Debug log
+                document.body.style.backgroundImage = backgroundUrl;
 
             } catch (error) {
                 weatherInfo.style.display = 'none';
