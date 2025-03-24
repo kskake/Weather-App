@@ -20,8 +20,7 @@
             transition: background-image 1s ease;
             background-size: cover;
             background-position: center;
-            background-color: #87CEEB; /* Fallback color */
-            background-image: linear-gradient(to bottom, #87CEEB, #E0F6FF); /* Fallback gradient */
+            background-image: linear-gradient(to bottom, #87CEEB, #E0F6FF); /* Default gradient */
         }
 
         .container {
@@ -31,6 +30,13 @@
             width: 100%;
             max-width: 400px;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: #333;
         }
 
         .search-box {
@@ -117,6 +123,7 @@
 </head>
 <body>
     <div class="container">
+        <h1 class="title">Weather App</h1>
         <div class="search-box">
             <input type="text" placeholder="Enter city name" id="cityInput">
             <button id="unitToggle">°C/°F</button>
@@ -170,17 +177,6 @@
         const windSpeed = document.getElementById('windSpeed');
         const unitToggle = document.getElementById('unitToggle');
 
-        // Background images for different weather conditions (using local images)
-        const backgrounds = {
-            'clear': 'url("sunny.jpg")',
-            'clouds': 'url("cloudy.jpg")',
-            'rain': 'url("rain.jpg")',
-            'snow': 'url("snow.jpg")',
-            'thunderstorm': 'url("thunderstorm.jpg")',
-            'mist': 'url("mist.jpg")',
-            'default': 'url("nature.jpg")'
-        };
-
         // State to track temperature unit
         let isCelsius = true;
         let currentWeatherData = null; // Store the latest weather data
@@ -201,12 +197,37 @@
             if (isCelsius) {
                 temperature.textContent = `${Math.round(temp)}°C`;
                 feelsLike.textContent = `${Math.round(feelsLikeTemp)}°C`;
+                setBackgroundGradient(temp); // Update gradient based on Celsius
             } else {
                 const tempF = (temp * 9/5) + 32;
                 const feelsLikeF = (feelsLikeTemp * 9/5) + 32;
                 temperature.textContent = `${Math.round(tempF)}°F`;
                 feelsLike.textContent = `${Math.round(feelsLikeF)}°F`;
+                setBackgroundGradient(temp); // Still use Celsius for gradient
             }
+        }
+
+        // Set background gradient based on temperature (in Celsius)
+        function setBackgroundGradient(temp) {
+            let gradient;
+            if (temp < 0) {
+                // Very Cold: Icy blue to white
+                gradient = 'linear-gradient(to bottom, #ADD8E6, #FFFFFF)';
+            } else if (temp >= 0 && temp < 10) {
+                // Cold: Light blue to sky blue
+                gradient = 'linear-gradient(to bottom, #87CEEB, #E0F6FF)';
+            } else if (temp >= 10 && temp < 20) {
+                // Mild: Light green to teal
+                gradient = 'linear-gradient(to bottom, #90EE90, #20B2AA)';
+            } else if (temp >= 20 && temp < 30) {
+                // Warm: Yellow to orange
+                gradient = 'linear-gradient(to bottom, #FFFF99, #FFA500)';
+            } else {
+                // Hot: Orange to red
+                gradient = 'linear-gradient(to bottom, #FFA500, #FF4500)';
+            }
+            document.body.style.backgroundImage = gradient;
+            console.log(`Setting background gradient for temp ${temp}°C: ${gradient}`);
         }
 
         input.addEventListener('keypress', (e) => {
@@ -243,25 +264,6 @@
                 // Additional weather details
                 humidity.textContent = `${data.main.humidity}%`;
                 windSpeed.textContent = `${data.wind.speed} m/s`;
-
-                // Change background based on weather
-                const weatherMain = data.weather[0].main.toLowerCase();
-                console.log(`Weather condition: ${weatherMain}`); // Debug log
-                const backgroundUrl = backgrounds[weatherMain] || backgrounds['default'];
-                console.log(`Setting background to: ${backgroundUrl}`); // Debug log
-
-                // Test if the background image loads
-                const img = new Image();
-                const imgSrc = backgroundUrl.replace('url("', '').replace('")', '');
-                img.src = imgSrc;
-                img.onload = () => {
-                    console.log('Background image loaded successfully');
-                    document.body.style.backgroundImage = backgroundUrl;
-                };
-                img.onerror = () => {
-                    console.error('Failed to load background image, using fallback');
-                    document.body.style.backgroundImage = 'linear-gradient(to bottom, #87CEEB, #E0F6FF)';
-                };
 
             } catch (error) {
                 weatherInfo.style.display = 'none';
